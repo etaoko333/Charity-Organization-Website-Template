@@ -1,0 +1,23 @@
+# Use data source to retrieve an Amazon Linux 2 AMI
+data "aws_ami" "amazon_ami" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+}
+
+# Create an EC2 instance
+resource "aws_instance" "web_server" {
+  ami                    = data.aws_ami.amazon_ami.id # Use the data source for the AMI
+  instance_type          = "t2.micro"                 # Change instance type if needed
+  key_name               = "olusola"                 # Change to your key pair name
+  subnet_id              = aws_subnet.public_subnet_az1.id
+  vpc_security_group_ids = [aws_security_group.webserver_security_group.id] # Correct security group reference
+                            
+  tags = {
+    Name = "charity-organization"
+  }
+}
